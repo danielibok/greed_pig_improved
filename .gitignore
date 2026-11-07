@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Vercel CLI local settings
+.vercel
+.env*.local
