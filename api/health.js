@@ -4,13 +4,11 @@
 // so this file automatically becomes /api/health.
 
 import { sql } from "./_lib/db.js";
+import { rejectMethod } from "./_lib/http.js";
 
 export default async function handler(req, res) {
   // Only allow GET requests. Anything else gets a clear error.
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
-    return res.status(405).json({ error: "Method not allowed. Use GET." });
-  }
+  if (rejectMethod(req, res, ["GET"])) return;
 
   // Also check we can reach the database.
   let database = "ok";
