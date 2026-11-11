@@ -1,13 +1,15 @@
-import { rollCategory, getRollPoints, sumScore, passTurn } from "./mechanic.js";
+import {
+  applyRoll
+} from "./mechanic.js";
 
-const s = {
-  players: [
-    { seat: 1, score: 0 },
-    { seat: 2, score: 0 },
-    { seat: 3, score: 0 },
-  ],
-  currentSeat: 2,
-  turnTotal: 9,
+const rollTest = {
+  players: [{ seat: 1, score: 0 }, { seat: 2, score: 0 }],
+  currentSeat: 1,
+  turnTotal: 5,
+  specialEven: 4,
+  specialOdd: 3
 };
-console.log(passTurn(s)); // expect currentSeat 3, turnTotal 0
-console.log(passTurn({ ...s, currentSeat: 3 })); // expect currentSeat 1 (wrap!)
+console.log(applyRoll(rollTest, 4)); // expect turnTotal 13 (5 + 8)
+console.log(applyRoll(rollTest, 3)); // expect turnTotal 2  (5 - 3)
+console.log(applyRoll(rollTest, 2)); // expect turnTotal 7  (5 + 2)
+console.log(applyRoll(rollTest, 1)); // expect turnTotal 0, currentSeat 2

@@ -50,3 +50,28 @@ export function passTurn(state) {
   const nextSeat = state.players[nextPosition].seat;
   return { ...state, currentSeat: nextSeat, turnTotal: 0 };
 }
+
+// this checks if a player can pass their turn
+// this way makes sure every player must roll before passing their turn
+export function checkPass(state) {
+  return state.turnTotal > 0;
+}
+
+export function addToScore(state) {
+  const newPlayers = state.players.map((p) => {
+    if (p.seat === state.currentSeat) {
+      return { ...p, score: p.score + state.turnTotal };
+    }
+    return p;
+  });
+  return { ...state, players: newPlayers };
+}
+
+export function applyRoll(state, roll) {
+  const category = rollCategory(roll, state.specialEven, state.specialOdd);
+  if (category === "bust") {
+    return passTurn(state);
+  }
+  const points = getRollPoints(roll, category);
+  return sumScore(state, points);
+}
