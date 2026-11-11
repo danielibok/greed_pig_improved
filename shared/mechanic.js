@@ -28,3 +28,25 @@ export function getRollPoints(roll, category) {
     return roll;
   }
 }
+
+//sumScore adds the rollpoints to the total rollpoints
+// and returns a new state
+export function sumScore(state, points) {
+  const newState = { ...state, turnTotal: state.turnTotal + points };
+  return newState;
+}
+
+//this is for the pass button / a bust
+// it checks a player current position and uses that
+// to move to the next player seat
+export function passTurn(state) {
+  const currentPosition = state.players.findIndex(
+    (p) => p.seat === state.currentSeat,
+  );
+  let nextPosition = currentPosition + 1;
+  if (nextPosition === state.players.length) {
+    nextPosition = 0;
+  }
+  const nextSeat = state.players[nextPosition].seat;
+  return { ...state, currentSeat: nextSeat, turnTotal: 0 };
+}
