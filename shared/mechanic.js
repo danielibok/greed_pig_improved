@@ -12,3 +12,19 @@ export function rollCategory(roll, specialEven, specialOdd) {
     return "normal";
   }
 }
+
+//this function gets the multiplier value for each roll category
+// and multiplies the roll to get the final roll points
+export function getRollPoints(roll, category) {
+  if (category === "bust") {
+    return 0;
+  } else if (category === "double") {
+    let muliplier = 2;
+    return roll * muliplier;
+  } else if (category === "negative") {
+    let muliplier = -1;
+    return roll * muliplier;
+  } else {
+    return roll;
+  }
+}
