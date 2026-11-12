@@ -18,6 +18,7 @@ function LiveGamePage() {
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [gameId, setGameId] = useState(null); // the id of the game saved on the server
   const [errorMessage, setErrorMessage] = useState(""); // shown by <ErrorToast />
+  const [announcement, setAnnouncement] = useState(""); // latest caption, shown by <AnnouncementBar />
   
   return (
     <>
@@ -56,6 +57,8 @@ function LiveGamePage() {
             setGameId,
             errorMessage,
             setErrorMessage,
+            announcement,
+            setAnnouncement,
           }}
         >
           <Outlet />
