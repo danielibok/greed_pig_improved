@@ -19,7 +19,7 @@ import { rejectMethod, sendError } from "../_lib/http.js";
 
 const MODES = ["friends", "computer"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 8; // same limit as the setup screen
 const MAX_NAME_LENGTH = 20;
 const PIG_COUNT = 29; // pig-0.png to pig-28.png in src/assets
 

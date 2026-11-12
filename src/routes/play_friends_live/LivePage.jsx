@@ -16,6 +16,8 @@ function LiveGamePage() {
   const [isRunning, setIsRunning] = useState("?"); //if the state of the game was still in the running points
   const [diceValue, setDiceValue] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState(0);
+  const [gameId, setGameId] = useState(null); // the id of the game saved on the server
+  const [errorMessage, setErrorMessage] = useState(""); // shown by <ErrorToast />
   
   return (
     <>
@@ -49,7 +51,11 @@ function LiveGamePage() {
             setIsGameOver,
             isGameOver,
             isContinue,
-            setIsContinue
+            setIsContinue,
+            gameId,
+            setGameId,
+            errorMessage,
+            setErrorMessage,
           }}
         >
           <Outlet />

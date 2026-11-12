@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSwitch from "src/components/SoundSwitch";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
+import { useState } from "react";
+import { createGame } from "src/api/client";
 
 function LiveGameSetup() {
   const {
@@ -18,28 +20,48 @@ function LiveGameSetup() {
     setIsGameOver,
     setCurrentPlayer,
     isContinue,
+    setGameId,
   } = useLiveGameContext();
+  const [isStarting, setIsStarting] = useState(false);
+  const [setupError, setSetupError] = useState("");
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
-  function setupPlayers(resume) {
-    if (!resume) {
-      let newPlayerData = playerData.map((player) => {
-        let newPlayer = {
-          ...player,
-          running_points: 0,
-          total_points: 0,
-        };
-        return newPlayer;
+  // Starting a new game now creates it on the server first.
+  // The server checks the settings and sends back the game's id.
+  async function setupPlayers(resume) {
+    if (resume) {
+      navigate("/live-game/game");
+      return;
+    }
+
+    setSetupError("");
+    setIsStarting(true);
+    try {
+      const game = await createGame({
+        mode: "friends",
+        targetScore: Number(maxPoints),
+        players: playerData.map((player) => ({
+          // If a player didn't type a name, use their pig's name instead.
+          name: player.name.trim() || player.tag,
+          pigIndex: player.pig_index,
+        })),
       });
 
+      setPlayerData(
+        playerData.map((player) => ({ ...player, running_points: 0, total_points: 0 }))
+      );
       setDiceValue(0);
       setIsGameOver(false);
       setCurrentPlayer(0);
-      setPlayerData(newPlayerData);
+      setGameId(game.id);
+      navigate("/live-game/game");
+    } catch (err) {
+      setSetupError(err.message);
+    } finally {
+      setIsStarting(false);
     }
-    navigate("/live-game/game");
   }
 
   function clearsPlayers() {
@@ -86,14 +108,20 @@ function LiveGameSetup() {
             </button>
             <SoundSwitch />
           </div>
+          {setupError && (
+            <p role="alert" className="text-[#ff6b6b] text-center">
+              {setupError}
+            </p>
+          )}
           <section className="flex gap-4 flex-wrap justify-center">
             {isContinue ? (
               <>
                 <button
                   onClick={() => {setupPlayers(false)}}
+                  disabled={isStarting}
                   className="w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
                 >
-                  Start New Game
+                  {isStarting ? "Starting..." : "Start New Game"}
                 </button>
                 <button
                   onClick={() => {setupPlayers(true)}}
@@ -105,9 +133,10 @@ function LiveGameSetup() {
             ) : (
               <button
                 onClick={() => {setupPlayers(false)}}
+                disabled={isStarting}
                 className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
               >
-                Start Game
+                {isStarting ? "Starting..." : "Start Game"}
               </button>
             )}
           </section>
