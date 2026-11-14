@@ -75,3 +75,30 @@ export function applyRoll(state, roll) {
   const points = getRollPoints(roll, category);
   return sumScore(state, points);
 }
+
+// this is the main function a server calls when a player clicks pass
+export function pass(state) {
+  if (!checkPass(state)) {
+    throw new Error("You can't pass yet. Turn total must be above 0");
+  }
+  const banked = addToScore(state);
+  return passTurn(banked);
+}
+
+// this function returns the seat of the player
+// who has reached or passed the max score (the winner)
+export function checkWinner(state) {
+  const winner = state.players.find((p) => p.score >= state.maxScore);
+  if (winner) {
+    return winner.seat;
+  }
+  return null;
+}
+
+export function pickSpecialNumbers(state, random = Math.random) {
+  const evens = [2, 4];
+  const odds = [3, 5];
+  const specialEven = evens[Math.floor(random() * evens.length)];
+  const specialOdd = odds[Math.floor(random() * odds.length)];
+  return { ...state, specialEven: specialEven, specialOdd: specialOdd };
+}
