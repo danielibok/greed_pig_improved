@@ -3,13 +3,14 @@ import { useLiveGameContext } from "src/context/useLiveGameContext";
 import Menu from "./Menu";
 import { Dice } from "src/components/Dice";
 import useServerGame from "src/hooks/useServerGame";
+import ModeInfo from "src/components/ModeInfo";
 
 // Mobile dice panel. Same logic as the desktop one (via useServerGame),
 // just laid out for a small screen.
 function DiceSectionMobile() {
-  const { playerData, setChangeBackground, maxPoints } = useLiveGameContext();
+  const { playerData, setChangeBackground, maxPoints, gameSettings } = useLiveGameContext();
   const [isRolling, setIsRolling] = useState(false);
-  const { requestRoll, showRoll, hold, canHold } = useServerGame();
+  const { requestRoll, showRoll, hold, canHold, isComputersTurn } = useServerGame();
   const holdDisabled = isRolling || !canHold;
 
   return (
@@ -31,11 +32,15 @@ function DiceSectionMobile() {
         setIsRolling={setIsRolling}
         isRolling={isRolling}
         setChangeBackground={setChangeBackground}
+        disabled={isComputersTurn}
       />
 
+      <ModeInfo />
       <Menu />
       <div className="text-white flex justify-between w-full">
-        <p className="text-center text-sm lg:text-lg">{playerData.length} players</p>
+        <p className="text-center text-sm lg:text-lg">
+          {gameSettings.mode === "computer" ? `vs Computer (${gameSettings.difficulty})` : `${playerData.length} players`}
+        </p>
         <p className="text-center text-sm lg:text-lg">{maxPoints} max points</p>
       </div>
     </div>

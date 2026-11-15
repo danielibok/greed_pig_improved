@@ -25,14 +25,14 @@ async function request(path, options = {}) {
 }
 
 // POST /api/games: start a new game. Returns the new game.
-export function createGame({ mode, difficulty, targetScore, players }) {
+export function createGame({ mode, rules, difficulty, targetScore, players }) {
   return request("/games", {
     method: "POST",
-    body: JSON.stringify({ mode, difficulty, targetScore, players }),
+    body: JSON.stringify({ mode, rules, difficulty, targetScore, players }),
   });
 }
 
-// POST /api/games/:id/roll: the server rolls the dice. Returns { dice, bust, game }.
+// POST /api/games/:id/roll: the server rolls the dice. Returns { dice, bust, category, game }.
 export function rollDice(gameId) {
   return request(`/games/${gameId}/roll`, { method: "POST" });
 }
@@ -45,4 +45,10 @@ export function holdTurn(gameId) {
 // GET /api/games/:id: the current state of a game.
 export function getGame(gameId) {
   return request(`/games/${gameId}`);
+}
+
+// POST /api/games/:id/bot-turn: the server plays the computer's whole turn.
+// Returns { steps, game } so the screen can replay each step.
+export function playComputerTurn(gameId) {
+  return request(`/games/${gameId}/bot-turn`, { method: "POST" });
 }

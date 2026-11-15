@@ -5,7 +5,9 @@ import NameInput from "./components/NameInput";
 import ImageSlider from "./components/ImageSlider";
 import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
-import SoundSwitch from "src/components/SoundSwitch";
+import SoundSettings from "src/components/SoundSettings";
+import RulesPicker from "./components/RulesPicker";
+import OpponentPicker from "./components/OpponentPicker";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { useState } from "react";
 import { createGame } from "src/api/client";
@@ -21,12 +23,24 @@ function LiveGameSetup() {
     setCurrentPlayer,
     isContinue,
     setGameId,
+    setAnnouncement,
+    gameSettings,
+    setGameSettings,
   } = useLiveGameContext();
+  const [rules, setRules] = useState(gameSettings.rules);
+  const [opponent, setOpponent] = useState(gameSettings.mode);
+  const [difficulty, setDifficulty] = useState(gameSettings.difficulty ?? "medium");
   const [isStarting, setIsStarting] = useState(false);
   const [setupError, setSetupError] = useState("");
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
+
+  // The human players, each with their real position in playerData (the name and
+  // pig pickers need it). The computer from a previous game is left out.
+  const humans = playerData.map((player, index) => ({ player, index })).filter(({ player }) => !player.isBot);
+  // Against the computer only the first player plays.
+  const shownPlayers = opponent === "computer" ? humans.slice(0, 1) : humans;
 
   // Starting a new game now creates it on the server first.
   // The server checks the settings and sends back the game's id.
@@ -39,28 +53,72 @@ function LiveGameSetup() {
     setSetupError("");
     setIsStarting(true);
     try {
+      const players = shownPlayers.map(({ player }) => player);
       const game = await createGame({
-        mode: "friends",
+        mode: opponent,
+        rules,
+        difficulty: opponent === "computer" ? difficulty : null,
         targetScore: Number(maxPoints),
-        players: playerData.map((player) => ({
+        players: players.map((player) => ({
           // If a player didn't type a name, use their pig's name instead.
           name: player.name.trim() || player.tag,
           pigIndex: player.pig_index,
         })),
       });
 
-      setPlayerData(
-        playerData.map((player) => ({ ...player, running_points: 0, total_points: 0 }))
-      );
+      // Against the computer, the server adds the bot in seat 1, so add it on screen too.
+      // It gets a different pig picture from the human.
+      const onScreen = players.map((player) => ({ ...player, running_points: 0, total_points: 0 }));
+      if (opponent === "computer") {
+        const botPig = players[0].pig_index === pigs.length - 1 ? 0 : pigs.length - 1;
+        onScreen.push({
+          id: "computer",
+          avatar: pigs[botPig],
+          tag: "Computer",
+          name: "Computer",
+          pig_index: botPig,
+          isBot: true,
+          running_points: 0,
+          total_points: 0,
+        });
+      }
+      setPlayerData(onScreen);
       setDiceValue(0);
       setIsGameOver(false);
       setCurrentPlayer(0);
       setGameId(game.id);
+      // Remember the mode and the special numbers the server picked, to show under the dice.
+      setGameSettings({
+        mode: game.mode,
+        difficulty: game.difficulty,
+        rules: game.rules,
+        specialEven: game.specialEven,
+        specialOdd: game.specialOdd,
+      });
+      setAnnouncement(""); // fresh caption for the new game
       navigate("/live-game/game");
     } catch (err) {
       setSetupError(err.message);
     } finally {
       setIsStarting(false);
+    }
+  }
+
+  // "Even out the Odds" games are slower (two bust numbers), so the
+  // suggested target drops to 50. Players can still type any score.
+  function changeRules(newRules) {
+    setRules(newRules);
+    if (newRules === "even-odds" && Number(maxPoints) === 100) setMaxPoints(50);
+    if (newRules === "classic" && Number(maxPoints) === 50) setMaxPoints(100);
+  }
+
+  // Switching back to friends after a computer game: friends need at least
+  // 2 players, so add a second one if there's only the one human left.
+  function changeOpponent(newOpponent) {
+    setOpponent(newOpponent);
+    if (newOpponent === "friends" && humans.length < 2) {
+      const extra = getInitialPlayerData(pigs, pigPetNames)[1];
+      setPlayerData([...humans.map(({ player }) => player), extra]);
     }
   }
 
@@ -73,6 +131,13 @@ function LiveGameSetup() {
       <main className="">
         <Navbar />
         <div className="flex flex-col items-center gap-8 text-white px-[5%] md:px-[10%] py-4 ">
+          <OpponentPicker
+            opponent={opponent}
+            onOpponentChange={changeOpponent}
+            difficulty={difficulty}
+            onDifficultyChange={setDifficulty}
+          />
+          <RulesPicker rules={rules} onChange={changeRules} />
           <section className="flex flex-col">
             <label htmlFor="">Max Score</label>
             <input
@@ -88,7 +153,7 @@ function LiveGameSetup() {
           </section>
           <div className=" w-full  gap-2 flow-root">
             <section className="max-h-[350px] w-full overflow-y-auto bg-[#ffffff10] border rounded-lg p-4 grid grid-cols-fluid justify-center gap-4">
-              {[...playerData].map((player, index) => (
+              {shownPlayers.map(({ player, index }) => (
                 <div
                   key={player.id}
                   className=" flex flex-col w-full items-center  gap-2 p-2 rounded-lg border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300"
@@ -98,7 +163,7 @@ function LiveGameSetup() {
                 </div>
               ))}
 
-              <AddPlayerButton />
+              {opponent === "friends" && <AddPlayerButton />}
             </section>
             <button
               className="text-right text-xs p-2 bg-[#D30C0C40] text-[#ffffff] w-fit border border-[#D30C0C80] duration-300 hover:bg-[#D30C0C80]   hover:border-[#D30C0C] rounded float-right mt-2"
@@ -106,7 +171,7 @@ function LiveGameSetup() {
             >
               Clear Players
             </button>
-            <SoundSwitch />
+            <SoundSettings />
           </div>
           {setupError && (
             <p role="alert" className="text-[#ff6b6b] text-center">

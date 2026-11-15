@@ -36,3 +36,10 @@ CREATE TABLE IF NOT EXISTS moves (
   dice_value  INTEGER,                               -- only for rolls
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Added for the "Even out the Odds" game mode.
+-- ADD COLUMN IF NOT EXISTS updates the existing games table without losing any games.
+-- rules: 'classic' or 'even-odds'. special_even: 2 or 4. special_odd: 3 or 5 (even-odds games only).
+ALTER TABLE games ADD COLUMN IF NOT EXISTS rules TEXT NOT NULL DEFAULT 'classic';
+ALTER TABLE games ADD COLUMN IF NOT EXISTS special_even INTEGER;
+ALTER TABLE games ADD COLUMN IF NOT EXISTS special_odd INTEGER;

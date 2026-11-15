@@ -3,13 +3,14 @@ import { useLiveGameContext } from "src/context/useLiveGameContext";
 import Menu from "./Menu";
 import { Dice } from "src/components/Dice";
 import useServerGame from "src/hooks/useServerGame";
+import ModeInfo from "src/components/ModeInfo";
 
 // Desktop dice panel. All the game logic now happens on the server;
 // useServerGame sends the requests and updates the screen.
 function DiceSection() {
-  const { playerData, setChangeBackground, maxPoints } = useLiveGameContext();
+  const { playerData, setChangeBackground, maxPoints, gameSettings } = useLiveGameContext();
   const [isRolling, setIsRolling] = useState(false);
-  const { requestRoll, showRoll, hold, canHold } = useServerGame();
+  const { requestRoll, showRoll, hold, canHold, isComputersTurn } = useServerGame();
   const holdDisabled = isRolling || !canHold;
 
   return (
@@ -20,6 +21,7 @@ function DiceSection() {
         setIsRolling={setIsRolling}
         isRolling={isRolling}
         setChangeBackground={setChangeBackground}
+        disabled={isComputersTurn}
       />
       <button
         onClick={hold}
@@ -31,8 +33,11 @@ function DiceSection() {
       >
         HOLD
       </button>
+      <ModeInfo />
       <div className="text-white grid place-content-center gap-2 bg-[#ffffff10] w-full p-4 rounded-lg border border-[#ffffff40]">
-        <p className="text-center text-sm lg:text-lg">{playerData.length} players</p>
+        <p className="text-center text-sm lg:text-lg">
+          {gameSettings.mode === "computer" ? `vs Computer (${gameSettings.difficulty})` : `${playerData.length} players`}
+        </p>
         <p className="text-center text-sm lg:text-lg">{maxPoints} max points</p>
       </div>
       <Menu />
