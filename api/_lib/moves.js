@@ -5,7 +5,8 @@ import { getGameState, isValidGameId } from "./games.js";
 
 // Loads a game and checks a move is allowed right now.
 // Returns { game } if it is, or { error, status } if it isn't.
-export async function loadGameForMove(id) {
+// forComputer: true is used by the bot-turn endpoint, which may ONLY move on the computer's turn.
+export async function loadGameForMove(id, { forComputer = false } = {}) {
   if (!isValidGameId(id)) return { error: "That isn't a valid game id.", status: 400 };
 
   const game = await getGameState(id);
@@ -13,7 +14,8 @@ export async function loadGameForMove(id) {
   if (game.status !== "playing") return { error: "This game is already over.", status: 409 };
 
   const current = game.players.find((p) => p.seat === game.currentSeat);
-  if (current.isBot) return { error: "It's the computer's turn.", status: 409 };
+  if (current.isBot && !forComputer) return { error: "It's the computer's turn.", status: 409 };
+  if (!current.isBot && forComputer) return { error: "It isn't the computer's turn.", status: 409 };
 
   return { game };
 }

@@ -19,9 +19,16 @@ function LiveGamePage() {
   const [gameId, setGameId] = useState(null); // the id of the game saved on the server
   const [errorMessage, setErrorMessage] = useState(""); // shown by <ErrorToast />
   const [announcement, setAnnouncement] = useState(""); // latest caption, shown by <AnnouncementBar />
-  // How this game is played, as the server saved it: rules ("classic" or "even-odds")
-  // and the special numbers for "Even out the Odds".
-  const [gameSettings, setGameSettings] = useState({ rules: "classic", specialEven: null, specialOdd: null });
+  // How this game is played, as the server saved it: against friends or the computer
+  // (and how hard it is), the rules ("classic" or "even-odds") and the special numbers.
+  const [gameSettings, setGameSettings] = useState({
+    mode: "friends",
+    difficulty: null,
+    rules: "classic",
+    specialEven: null,
+    specialOdd: null,
+  });
+  const [isComputerThinking, setIsComputerThinking] = useState(false); // true while the bot plays its turn
   
   return (
     <>
@@ -64,6 +71,8 @@ function LiveGamePage() {
             setAnnouncement,
             gameSettings,
             setGameSettings,
+            isComputerThinking,
+            setIsComputerThinking,
           }}
         >
           <Outlet />

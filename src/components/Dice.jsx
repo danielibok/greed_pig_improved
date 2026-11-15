@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLiveGameContext } from "src/context/useLiveGameContext";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import diceRollSound from "src/sound_effect/dice_roll.mp3";
 import useAudio from "src/hooks/useAudio";
@@ -9,14 +10,21 @@ const MIN_SPIN_MS = 1200;
 
 // The dice no longer decides the number itself. It asks the server
 // (requestRoll), spins while waiting, then lands on the server's number.
-export function Dice({ requestRoll, onRollShown, setIsRolling, isRolling, setChangeBackground }) {
+export function Dice({ requestRoll, onRollShown, setIsRolling, isRolling, setChangeBackground, disabled = false }) {
   const { preloadSrcList } = useGreedyPigContext();
   const [currentDice, setCurrentDice] = useState(0);
   const die = preloadSrcList.filter((dice) => dice.includes("dice"));
   const diceRollAudio = useAudio(diceRollSound);
+  const { diceValue } = useLiveGameContext();
+
+  // When the computer rolls, the number arrives from outside this component,
+  // so show whatever the game's latest dice value is.
+  useEffect(() => {
+    if (diceValue >= 1) setCurrentDice(diceValue - 1);
+  }, [diceValue]);
 
   async function handleDiceClick() {
-    if (isRolling) return;
+    if (isRolling || disabled) return;
     setIsRolling(true);
     setChangeBackground(true);
 
@@ -47,8 +55,8 @@ export function Dice({ requestRoll, onRollShown, setIsRolling, isRolling, setCha
       <button
         className={`hover:scale-105 active:scale-100 duration-300 md:w-auto w-[200px]`}
         onClick={handleDiceClick}
-        disabled={isRolling}
-        aria-label={isRolling ? "Rolling the dice" : "Roll the dice"}
+        disabled={isRolling || disabled}
+        aria-label={disabled ? "Dice (computer's turn)" : isRolling ? "Rolling the dice" : "Roll the dice"}
       >
         {die.map((dice, index) => (
           <img

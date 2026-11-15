@@ -46,3 +46,9 @@ export function holdTurn(gameId) {
 export function getGame(gameId) {
   return request(`/games/${gameId}`);
 }
+
+// POST /api/games/:id/bot-turn: the server plays the computer's whole turn.
+// Returns { steps, game } so the screen can replay each step.
+export function playComputerTurn(gameId) {
+  return request(`/games/${gameId}/bot-turn`, { method: "POST" });
+}

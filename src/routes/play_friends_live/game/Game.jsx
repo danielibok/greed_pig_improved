@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import useServerGame from "src/hooks/useServerGame";
 import Navbar from "src/components/Navbar";
 import { useLiveGameContext } from "src/context/useLiveGameContext";
 import PlayerTable from "./components/PlayerTable";
@@ -18,6 +19,19 @@ export default function LiveGame() {
   useEffect(() => {
     setIsContinue(true)
   }, [])
+
+  // When it becomes the computer's turn, let it play. The ref makes sure only one
+  // computer turn runs at a time, even though the screen re-draws during it.
+  const { runComputerTurn } = useServerGame();
+  const computerTurnRunning = useRef(false);
+  useEffect(() => {
+    const player = playerData[currentPlayer];
+    if (!gameId || isGameOver || !player?.isBot || computerTurnRunning.current) return;
+    computerTurnRunning.current = true;
+    runComputerTurn().finally(() => {
+      computerTurnRunning.current = false;
+    });
+  }, [currentPlayer, gameId, isGameOver, playerData]);
 
   // No game on the server yet (e.g. the page was refreshed): go back to setup.
   if (!gameId) return <Navigate to="/live-game/setup" replace />;
