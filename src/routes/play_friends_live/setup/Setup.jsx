@@ -5,7 +5,7 @@ import NameInput from "./components/NameInput";
 import ImageSlider from "./components/ImageSlider";
 import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
-import SoundSwitch from "src/components/SoundSwitch";
+import SoundSettings from "src/components/SoundSettings";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { useState } from "react";
 import { createGame } from "src/api/client";
@@ -21,6 +21,7 @@ function LiveGameSetup() {
     setCurrentPlayer,
     isContinue,
     setGameId,
+    setAnnouncement,
   } = useLiveGameContext();
   const [isStarting, setIsStarting] = useState(false);
   const [setupError, setSetupError] = useState("");
@@ -56,6 +57,7 @@ function LiveGameSetup() {
       setIsGameOver(false);
       setCurrentPlayer(0);
       setGameId(game.id);
+      setAnnouncement(""); // fresh caption for the new game
       navigate("/live-game/game");
     } catch (err) {
       setSetupError(err.message);
@@ -106,7 +108,7 @@ function LiveGameSetup() {
             >
               Clear Players
             </button>
-            <SoundSwitch />
+            <SoundSettings />
           </div>
           {setupError && (
             <p role="alert" className="text-[#ff6b6b] text-center">

@@ -9,6 +9,7 @@ import StatsSectionMobile from "./components/StatsSectionMobile";
 import CurrentPlayerMobile from "./components/CurrentPlayerMobile";
 import DiceSectionMobile from "./components/DiceSectionMobile";
 import ErrorToast from "src/components/ErrorToast";
+import AnnouncementBar from "src/components/AnnouncementBar";
 import { Navigate } from "react-router-dom";
 
 export default function LiveGame() {
@@ -26,6 +27,7 @@ export default function LiveGame() {
       <DiceSection />
       <div className=" space-y-2 p-2">
         <Navbar />
+        <AnnouncementBar />
         <PlayerTable playerData={playerData} currentPlayer={currentPlayer} />
       </div>
       <CurrentPlayerMobile playerData={playerData} currentPlayer={currentPlayer}/>

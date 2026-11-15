@@ -5,6 +5,7 @@
 import { useLiveGameContext } from "src/context/useLiveGameContext";
 import { rollDice, holdTurn } from "src/api/client";
 import useAudio from "src/hooks/useAudio";
+import useAnnouncer from "src/hooks/useAnnouncer";
 import addPlayerSound from "src/sound_effect/add_player.mp3";
 import loseSound from "src/sound_effect/lose_sound.mp3";
 import celebrationSound from "src/sound_effect/celebration.mp3";
@@ -24,6 +25,13 @@ export default function useServerGame() {
   const holdAudio = useAudio(addPlayerSound);
   const loseAudio = useAudio(loseSound);
   const celebrationAudio = useAudio(celebrationSound);
+  const announce = useAnnouncer();
+
+  // The name to read out: what the player typed, or their pig's name.
+  function nameOf(seat) {
+    const player = playerData[seat];
+    return player?.name?.trim() || player?.tag || `Player ${seat + 1}`;
+  }
 
   // The server is the source of truth. After every move we copy its scores
   // into the screen's existing playerData, keeping each player's local name
@@ -64,16 +72,29 @@ export default function useServerGame() {
 
   // Step 2 of a roll: once the dice animation lands, update the screen.
   function showRoll(result) {
+    const roller = nameOf(currentPlayer);
     setDiceValue(result.dice);
-    if (result.bust) loseAudio?.play();
+    if (result.bust) {
+      loseAudio?.play();
+      announce(`${roller} rolled a 1. Bust! ${nameOf(result.game.currentSeat)}'s turn.`);
+    } else {
+      announce(`${roller} rolled a ${result.dice}. Turn total ${result.game.turnTotal}.`);
+    }
     applyServerGame(result.game);
   }
 
   // Bank the points and pass the turn on.
   async function hold() {
     try {
+      const holder = nameOf(currentPlayer);
       const result = await holdTurn(gameId);
       holdAudio?.play();
+      const total = result.game.players[currentPlayer].score;
+      if (result.game.status === "finished") {
+        announce(`${holder} banks ${result.banked} points and wins with ${total}!`);
+      } else {
+        announce(`${holder} banks ${result.banked} points, ${total} in total. ${nameOf(result.game.currentSeat)}'s turn.`);
+      }
       applyServerGame(result.game);
     } catch (err) {
       setErrorMessage(err.message);
