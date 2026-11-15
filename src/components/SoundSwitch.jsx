@@ -7,6 +7,8 @@ function SoundSwitch() {
   return (
     <button
       className="text-right text-xs  text-[#ffffff] mt-2 duration-300"
+      aria-label="Sound effects"
+      aria-pressed={hasSound}
       onClick={() => {
         setHasSound(!hasSound);
       }}
