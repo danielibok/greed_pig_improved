@@ -70,16 +70,21 @@ export default function useServerGame() {
     }
   }
 
+  // The caption for a roll. In "Even out the Odds" it also says what the
+  // special numbers did, e.g. "Iggy rolled a 4. Double! Turn total 12."
+  function describeRoll(roller, { dice, bust, category, game }) {
+    if (bust) return `${roller} rolled a ${dice}. Bust! ${nameOf(game.currentSeat)}'s turn.`;
+    if (category === "double") return `${roller} rolled a ${dice}. Double! Turn total ${game.turnTotal}.`;
+    if (category === "negative") return `${roller} rolled a ${dice}. Minus ${dice}! Turn total ${game.turnTotal}.`;
+    return `${roller} rolled a ${dice}. Turn total ${game.turnTotal}.`;
+  }
+
   // Step 2 of a roll: once the dice animation lands, update the screen.
   function showRoll(result) {
     const roller = nameOf(currentPlayer);
     setDiceValue(result.dice);
-    if (result.bust) {
-      loseAudio?.play();
-      announce(`${roller} rolled a 1. Bust! ${nameOf(result.game.currentSeat)}'s turn.`);
-    } else {
-      announce(`${roller} rolled a ${result.dice}. Turn total ${result.game.turnTotal}.`);
-    }
+    if (result.bust) loseAudio?.play();
+    announce(describeRoll(roller, result));
     applyServerGame(result.game);
   }
 
@@ -101,7 +106,8 @@ export default function useServerGame() {
     }
   }
 
-  // Holding with 0 points isn't allowed, so the button is disabled until you roll.
+  // You can only hold with points to bank (in "Even out the Odds" the total can drop below 0),
+  // so the button is disabled until then.
   const canHold = (playerData[currentPlayer]?.running_points ?? 0) > 0;
 
   return { requestRoll, showRoll, hold, canHold };

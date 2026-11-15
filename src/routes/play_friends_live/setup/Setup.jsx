@@ -6,6 +6,7 @@ import ImageSlider from "./components/ImageSlider";
 import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSettings from "src/components/SoundSettings";
+import RulesPicker from "./components/RulesPicker";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { useState } from "react";
 import { createGame } from "src/api/client";
@@ -22,7 +23,10 @@ function LiveGameSetup() {
     isContinue,
     setGameId,
     setAnnouncement,
+    gameSettings,
+    setGameSettings,
   } = useLiveGameContext();
+  const [rules, setRules] = useState(gameSettings.rules);
   const [isStarting, setIsStarting] = useState(false);
   const [setupError, setSetupError] = useState("");
   const navigate = useNavigate();
@@ -42,6 +46,7 @@ function LiveGameSetup() {
     try {
       const game = await createGame({
         mode: "friends",
+        rules,
         targetScore: Number(maxPoints),
         players: playerData.map((player) => ({
           // If a player didn't type a name, use their pig's name instead.
@@ -57,6 +62,8 @@ function LiveGameSetup() {
       setIsGameOver(false);
       setCurrentPlayer(0);
       setGameId(game.id);
+      // Remember the mode and the special numbers the server picked, to show under the dice.
+      setGameSettings({ rules: game.rules, specialEven: game.specialEven, specialOdd: game.specialOdd });
       setAnnouncement(""); // fresh caption for the new game
       navigate("/live-game/game");
     } catch (err) {
@@ -64,6 +71,14 @@ function LiveGameSetup() {
     } finally {
       setIsStarting(false);
     }
+  }
+
+  // "Even out the Odds" games are slower (two bust numbers), so the
+  // suggested target drops to 50. Players can still type any score.
+  function changeRules(newRules) {
+    setRules(newRules);
+    if (newRules === "even-odds" && Number(maxPoints) === 100) setMaxPoints(50);
+    if (newRules === "classic" && Number(maxPoints) === 50) setMaxPoints(100);
   }
 
   function clearsPlayers() {
@@ -75,6 +90,7 @@ function LiveGameSetup() {
       <main className="">
         <Navbar />
         <div className="flex flex-col items-center gap-8 text-white px-[5%] md:px-[10%] py-4 ">
+          <RulesPicker rules={rules} onChange={changeRules} />
           <section className="flex flex-col">
             <label htmlFor="">Max Score</label>
             <input

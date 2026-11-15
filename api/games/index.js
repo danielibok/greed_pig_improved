@@ -4,6 +4,7 @@
 // Example request body:
 // {
 //   "mode": "friends",                 // "friends" or "computer"
+//   "rules": "classic",                // "classic" or "even-odds" (optional, default "classic")
 //   "difficulty": null,                // "easy" | "medium" | "hard" (computer games only)
 //   "targetScore": 100,                // points needed to win (25 to 1000)
 //   "players": [
@@ -12,10 +13,11 @@
 //   ]
 // }
 
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomInt } from "node:crypto";
 import { sql } from "../_lib/db.js";
 import { getGameState } from "../_lib/games.js";
 import { rejectMethod, sendError } from "../_lib/http.js";
+import { RULES, pickSpecialNumbers } from "../../shared/rules.js";
 
 const MODES = ["friends", "computer"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
@@ -27,9 +29,10 @@ const PIG_COUNT = 29; // pig-0.png to pig-28.png in src/assets
 function validate(body) {
   if (!body || typeof body !== "object") return "Request body must be JSON.";
 
-  const { mode, difficulty, targetScore, players } = body;
+  const { mode, difficulty, targetScore, players, rules = "classic" } = body;
 
   if (!MODES.includes(mode)) return `mode must be one of: ${MODES.join(", ")}.`;
+  if (!RULES.includes(rules)) return `rules must be one of: ${RULES.join(", ")}.`;
 
   if (mode === "computer" && !DIFFICULTIES.includes(difficulty)) {
     return `difficulty must be one of: ${DIFFICULTIES.join(", ")}.`;
@@ -73,6 +76,14 @@ export default async function handler(req, res) {
 
   const { mode, targetScore } = req.body;
   const difficulty = mode === "computer" ? req.body.difficulty : null;
+  const rules = req.body.rules ?? "classic";
+
+  // In "Even out the Odds" the SERVER picks the special numbers, so nobody can choose them.
+  // randomInt is the secure random generator, the same one used for dice rolls.
+  const specials =
+    rules === "even-odds"
+      ? pickSpecialNumbers(() => randomInt(0, 1_000_000) / 1_000_000)
+      : { specialEven: null, specialOdd: null };
 
   // Build the player list. In a computer game, the bot always sits in seat 1.
   const players = req.body.players.map((p, seat) => ({
@@ -92,8 +103,9 @@ export default async function handler(req, res) {
     // either everything is saved, or nothing is.
     await sql.transaction([
       sql`
-        INSERT INTO games (id, mode, difficulty, target_score)
-        VALUES (${gameId}, ${mode}, ${difficulty}, ${targetScore})
+        INSERT INTO games (id, mode, difficulty, target_score, rules, special_even, special_odd)
+        VALUES (${gameId}, ${mode}, ${difficulty}, ${targetScore}, ${rules},
+                ${specials.specialEven}, ${specials.specialOdd})
       `,
       ...players.map(
         (p) => sql`

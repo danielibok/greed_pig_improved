@@ -9,7 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "db:setup": "node --env-file=.env.local scripts/setup-db.js",
-    "test:rules": "node shared/game-rules.test.js"
+    "test:rules": "node shared/game-rules.test.js && node shared/rules.test.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
