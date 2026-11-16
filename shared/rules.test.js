@@ -17,13 +17,14 @@ assert.equal(describeRoll(oddsGame, 4), "double");
 // ...the special odd takes points away (and can go below 0)...
 assert.equal(roll(oddsGame, 3).turnTotal, -3);
 assert.equal(canHold(roll(oddsGame, 3)), false);
-// ...and both 1 and 6 bust, passing the turn.
-for (const dice of [1, 6]) {
-  const s = roll({ ...oddsGame, turnTotal: 10 }, dice);
-  assert.equal(s.bust, true);
-  assert.equal(s.turnTotal, 0);
-  assert.equal(s.currentSeat, 1);
-}
+// ...a 1 busts, passing the turn...
+const busted = roll({ ...oddsGame, turnTotal: 10 }, 1);
+assert.equal(busted.bust, true);
+assert.equal(busted.turnTotal, 0);
+assert.equal(busted.currentSeat, 1);
+// ...and a 6 is no longer a bust: it scores 6 like any normal number.
+assert.equal(roll(oddsGame, 6).bust, false);
+assert.equal(roll(oddsGame, 6).turnTotal, 6);
 // Other numbers score normally.
 assert.equal(roll(oddsGame, 2).turnTotal, 2);
 assert.equal(roll(oddsGame, 5).bust, false);

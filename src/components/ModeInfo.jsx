@@ -16,7 +16,7 @@ export default function ModeInfo() {
       <ul className="space-y-1">
         <li><span className="font-bold text-[#7CFC9A]">{gameSettings.specialEven}</span> scores double</li>
         <li><span className="font-bold text-[#FF8A8A]">{gameSettings.specialOdd}</span> takes points away</li>
-        <li><span className="font-bold">1</span> and <span className="font-bold">6</span> are busts</li>
+        <li><span className="font-bold">1</span> is a bust</li>
       </ul>
     </section>
   );
