@@ -12,7 +12,7 @@ const OPTIONS = [
     value: "even-odds",
     label: "Even out the Odds",
     description:
-      "Each game picks a special even (2 or 4) that scores double and a special odd (3 or 5) that takes points away. A 1 loses your turn's points.",
+      "Each game picks a special even (2, 4 or 6) that scores double and a special odd (3 or 5) that takes points away. A 1 loses your turn's points.",
   },
 ];
 

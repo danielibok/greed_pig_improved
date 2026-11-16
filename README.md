@@ -21,7 +21,7 @@ On your turn, roll the dice as many times as you like. Every roll adds to your t
 
 ### 1. Gameplay and rules: Even out the Odds mode
 
-A second way to play, picked on the setup page. At the start of each game the server secretly picks a **special even number** (2 or 4) that scores **double**, and a **special odd number** (3 or 5) that **takes points away**. The numbers are shown under the dice. Your turn total can go below zero, so you can only hold once it is above 0. The default target is 50.
+A second way to play, picked on the setup page. At the start of each game the server secretly picks a **special even number** (2, 4 or 6) that scores **double**, and a **special odd number** (3 or 5) that **takes points away**. The numbers are shown under the dice. Your turn total can go below zero, so you can only hold once it is above 0. The default target is 50.
 
 ### 2. Computer opponents: difficulty levels
 
