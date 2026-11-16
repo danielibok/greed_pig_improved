@@ -40,7 +40,7 @@ export default function LiveGame() {
     <div className="md:grid md:grid-cols-[minmax(auto,_200px)_1fr_minmax(auto,_200px)] lg:grid-cols-[minmax(auto,_250px)_1fr_minmax(auto,_250px)] xl:grid-cols-[auto_1fr_minmax(auto,_300px)] relative">
       <DiceSection />
       <div className=" space-y-2 p-2">
-        <Navbar />
+        <Navbar showExit />
         <AnnouncementBar />
         <PlayerTable playerData={playerData} currentPlayer={currentPlayer} />
       </div>

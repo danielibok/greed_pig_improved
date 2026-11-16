@@ -1,8 +1,19 @@
 import React from "react";
 import logo from "../assets/pig-0.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Navbar() {
+// The bar at the top of the setup and game screens.
+// In a game (showExit), it also has an "Exit game" button that asks first,
+// so a misclick doesn't throw away a game in progress.
+export default function Navbar({ showExit = false }) {
+  const navigate = useNavigate();
+
+  function exitGame() {
+    if (window.confirm("Leave this game and go back to the home page? This game will end.")) {
+      navigate("/");
+    }
+  }
+
   return (
     <nav className="sticky top-0 w-full flex justify-between py-2 px-4 md:px-[2%] md:py-[2%] text-white border-b border-b-[#ffffff80] backdrop-blur items-center">
       <a href={`/`} className="flex lg:gap-2 items-center">
@@ -12,6 +23,16 @@ export default function Navbar() {
 
         <img src={logo} alt="logo" width={75} />
       </a>
+      <div className="flex items-center gap-4">
+      {showExit && (
+        <button
+          type="button"
+          onClick={exitGame}
+          className="bg-[#D30CBD80] hover:bg-[#D30CBD] duration-300 text-white font-bold rounded-lg px-3 py-1 md:px-4 md:py-2"
+        >
+          Exit game
+        </button>
+      )}
       <Link
         to={`/live-game/how-to-play`}
         className=" text-[#ffffff] hover:underline duration-300 font-bold hidden md:flex"
@@ -24,6 +45,7 @@ export default function Navbar() {
       >
         ?
       </Link>
+      </div>
     </nav>
   );
 }
