@@ -60,7 +60,7 @@ export default function HowToPlay() {
           <h1 className="pri-font text-2xl lg:text-4xl">EVEN OUT THE ODDS</h1>
           <Card>
             <ul className="list-disc space-y-2 pl-4">
-              <li>At the start, the game picks a <b>special even number</b> (2 or 4) that scores <b>double</b>.</li>
+              <li>At the start, the game picks a <b>special even number</b> (2, 4 or 6) that scores <b>double</b>.</li>
               <li>It also picks a <b>special odd number</b> (3 or 5) that <b>takes points away</b>, so your turn total can drop below zero.</li>
               <li>A <b>1</b> is still a bust. The special numbers are shown under the dice.</li>
               <li>You can only hold when your turn total is above 0. The default target is 50.</li>
