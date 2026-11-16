@@ -1,8 +1,8 @@
-// returns type of a roll : a bust (1 / 6),
+// returns type of a roll : a bust (1),
 // special odd number ( minus points)
 // or special even number (double points)
 export function rollCategory(roll, specialEven, specialOdd) {
-  if (roll === 1 || roll === 6) {
+  if (roll === 1) {
     return "bust";
   } else if (roll === specialEven) {
     return "double";
@@ -56,7 +56,8 @@ export function passTurn(state) {
 export function checkPass(state) {
   return state.turnTotal > 0;
 }
-
+ 
+// adds turnTotal to current player's score
 export function addToScore(state) {
   const newPlayers = state.players.map((p) => {
     if (p.seat === state.currentSeat) {
@@ -96,7 +97,7 @@ export function checkWinner(state) {
 }
 
 export function pickSpecialNumbers(state, random = Math.random) {
-  const evens = [2, 4];
+  const evens = [2, 4, 6];
   const odds = [3, 5];
   const specialEven = evens[Math.floor(random() * evens.length)];
   const specialOdd = odds[Math.floor(random() * odds.length)];
