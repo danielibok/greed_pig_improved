@@ -4,81 +4,98 @@ import { AiFillHome } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import BackButton from "src/components/BackButton";
 
-export default function HowToPlay() {
+// One card on the How to Play page.
+function Card({ title, children }) {
+  return (
+    <section className="backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg">
+      {title && <h2 className="text-lg lg:text-2xl font-bold mb-2">{title}</h2>}
+      {children}
+    </section>
+  );
+}
 
+export default function HowToPlay() {
   return (
     <div className="p-[5%] flex flex-col relative w-full items-center ">
       <nav className="fixed top-0 w-full flex justify-between p-[5%]">
         <BackButton />
         <Link
           to={`/setup`}
+          aria-label="Home"
           className=" bg-[#D30CBD80] hover:bg-[#D30CBD] duration-300 text-white w-[48px] h-[48px] border rounded-full flex items-center justify-around"
         >
           <AiFillHome size={24} />
         </Link>
       </nav>
-
       <div className="flex flex-col items-center gap-6 lg:gap-12 md:max-w-[70%] xl:max-w-[55%]">
-        <figure className="">
-          <img src={logo} alt="logo" width={400} />
+        <figure>
+          <img src={logo} alt="Greedy Pig logo" width={400} />
         </figure>
-        <section className="text-white space-y-4">
+
+        <section className="text-white space-y-4 w-full">
           <h1 className="pri-font text-2xl lg:text-4xl">GAME SETUP</h1>
-          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg">
-            <ol className=" list-decimal">
-              <li>Enter the max total point you want to reach. "First person to get to 100"</li>
-              <li>Enter the number of players playing</li>
-              <li>Enter the player names</li>
-              <li>Next click on the "Play" button</li>
+          <Card>
+            <ol className="list-decimal space-y-2 pl-4">
+              <li>Choose who you play against: <b>Friends</b> on the same screen, or <b>The computer</b> (pick Easy, Medium or Hard).</li>
+              <li>Choose a game mode: <b>Classic</b> or <b>Even out the Odds</b>.</li>
+              <li>Set the score needed to win, and type the players' names.</li>
+              <li>Turn the voice and sound effects on or off in the <b>Sound</b> box, then press <b>Play</b>.</li>
             </ol>
-          </section>
+          </Card>
         </section>
-  
-        <section className="text-white space-y-4">
-          <h1 className="pri-font text-2xl lg:text-4xl">GREEDY PIG RULES </h1>
-          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg flex flex-col items-center text-center">
-          <h4 className=" text-lg lg:text-2xl font-bold">
-            1.
-          </h4>
-          <p >
-          Each turn, a player repeatedly rolls a die until either a <b>1</b> is rolled or the player decides to <b>"pass"</b>
-          </p>
-          </section>
-          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg flex flex-col items-center text-center">
-          <h4 className=" text-lg lg:text-2xl font-bold">
-            2.
-          </h4>
-          <p >
-          If the player rolls a <b>1</b>, they score nothing and it becomes the next player's turn.
-          </p>
-          </section>
-          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg flex flex-col items-center text-center">
-          <h4 className=" text-lg lg:text-2xl font-bold">
-            3.
-          </h4>
-          <p >
-          If the player rolls any other number, it is added to their turn total and the player's turn continues.
-          </p>
-          </section>
-          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg flex flex-col items-center text-center">
-          <h4 className=" text-lg lg:text-2xl font-bold">
-            4.
-          </h4>
-          <p >
-          The first player to score <b>100</b> or more points wins
-          </p>
-          </section>
+
+        <section className="text-white space-y-4 w-full">
+          <h1 className="pri-font text-2xl lg:text-4xl">CLASSIC RULES</h1>
+          <Card>
+            <ol className="list-decimal space-y-2 pl-4">
+              <li>On your turn, roll the dice as many times as you like. Each roll is added to your <b>turn total</b>.</li>
+              <li>Roll a <b>1</b> and you lose your whole turn total, and the next player goes.</li>
+              <li>Press <b>Hold</b> to bank your turn total and pass the dice. You must roll at least once first.</li>
+              <li>The first player to reach the target score (100 unless you change it) wins.</li>
+            </ol>
+          </Card>
         </section>
-        <section className="text-white space-y-4">
-          <h1 className="pri-font text-2xl lg:text-4xl">About the Devs</h1>
-          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg">
-            <ul className=" list-disc space-y-4">
-              <li>My name is Nwachuwku I am a front-end dev.</li>
-              <li>This is my <a href="https://sites.google.com/view/nwachukwuujubuonu/home" target="blanks" className=" underline text-[#D30CBD] font-bold">portfolio site</a> if you you like to see some of my other works.</li>
-              <li>This project was built with React and Vite</li>
-              <li>I didn't work alone. This project was designed by <b>Oluwatomisin Rhema Eghosa Odukoya</b> and <b>Alozie Blessed  Chuebuka</b>. </li>
+
+        <section className="text-white space-y-4 w-full">
+          <h1 className="pri-font text-2xl lg:text-4xl">EVEN OUT THE ODDS</h1>
+          <Card>
+            <ul className="list-disc space-y-2 pl-4">
+              <li>At the start, the game picks a <b>special even number</b> (2 or 4) that scores <b>double</b>.</li>
+              <li>It also picks a <b>special odd number</b> (3 or 5) that <b>takes points away</b>, so your turn total can drop below zero.</li>
+              <li>A <b>1</b> is still a bust. The special numbers are shown under the dice.</li>
+              <li>You can only hold when your turn total is above 0. The default target is 50.</li>
             </ul>
-          </section>
+          </Card>
+        </section>
+
+        <section className="text-white space-y-4 w-full">
+          <h1 className="pri-font text-2xl lg:text-4xl">PLAYING THE COMPUTER</h1>
+          <Card>
+            <ul className="list-disc space-y-2 pl-4">
+              <li><b>Easy</b> plays nervously and banks small amounts.</li>
+              <li><b>Medium</b> holds once it has 20 points in a turn.</li>
+              <li><b>Hard</b> plays safe when it's ahead, takes risks when it's behind, and won't stop if you're about to win.</li>
+              <li>The dice is locked while the computer takes its turn, so you can watch each roll.</li>
+            </ul>
+          </Card>
+        </section>
+
+        <section className="text-white space-y-4 w-full">
+          <h1 className="pri-font text-2xl lg:text-4xl">VOICE AND CAPTIONS</h1>
+          <Card>
+            <p>Every roll is read out loud and shown as a caption above the scores, so you can follow the game by listening or by reading. Screen readers announce the captions too. Change the voice, sound effects and volume in the Sound box on the setup page.</p>
+          </Card>
+        </section>
+
+        <section className="text-white space-y-4 w-full">
+          <h1 className="pri-font text-2xl lg:text-4xl">About</h1>
+          <Card>
+            <ul className="list-disc space-y-2 pl-4">
+              <li>Greedy Pig Reimagined was made for CSC 419 by Daniel Ibok, Richard Okelu, Oluseyi Olukogbon and Joachim Okpara.</li>
+              <li>It is built on the original Greedy Pig by <b>Nwachukwu Ujubuonu</b>, designed by <b>Oluwatomisin Rhema Eghosa Odukoya</b> and <b>Alozie Blessed Chuebuka</b>.</li>
+              <li>Built with React, Vite, Vercel and a Postgres database.</li>
+            </ul>
+          </Card>
         </section>
       </div>
     </div>
